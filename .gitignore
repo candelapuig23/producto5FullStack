@@ -1,0 +1,77 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Logs
+logs
+*.log
+logs/
+
+# Configuración local y de entorno
+.env
+.env.local
+.env.*.local
+
+# Cachés y dependencias temporales
+.cache/
+*.pid
+.parcel-cache/
+.pnpm-debug.log*
+
+# Resultados de construcción
+dist/
+build/
+temp/
+coverage/
+
+# Archivos de pruebas
+__tests__/
+__mocks__/
+*.test.js
+*.spec.js
+*.test.ts
+*.spec.ts
+*.snap
+
+# Editor y sistema operativo
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Archivos relacionados con MongoDB
+*.lock
+*.log
+mongod.lock
+
+# Archivos de GraphQL
+*.graphql-schema.json
+graphql-schema.graphql
+graphql-schema.*
+
+# Archivos binarios (imágenes, PDFs, etc.)
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+
+# Otros archivos generados
+*.tmp
+*.bak
+*.out
+*.csv
+*.rpt
+
+# Archivos de configuración de deploy
+*.publish.xml
+*.pubxml
+PublishScripts/
+
+# Evitar conflictos de formato JSON
+*.json text
+
+# Ignore .env files
+.env

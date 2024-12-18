@@ -1,0 +1,335 @@
+
+/* Eliminar la opacidad del modal */
+.modal-backdrop {
+    display: none !important; /* Eliminar el fondo de opacidad */
+}
+
+/* Eliminar la clase modal-open del body */
+.modal-open {
+    overflow: auto !important; 
+}
+
+/* Centrar el logo en la barra de navegación usando transformaciones y flexbox */
+.navbar-brand {
+    position: absolute;
+    left: 50%;
+    /* Posiciona el logo en el centro horizontal */
+    transform: translateX(-50%);
+    /* Ajusta el logo para que quede centrado completamente */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.navbar-brand img {
+    height: 150px;
+    /* Ajusta el tamaño del logo */
+    width: auto;
+    /* Mantiene las proporciones del logo */
+}
+
+/* Asegurar que los otros elementos de la barra de navegación no interfieran con el logo */
+#menu-toggle {
+    margin-right: auto;
+    /* Desplaza el botón hacia la izquierda */
+}
+
+.navbar-nav {
+    margin-left: auto;
+    /* Desplaza el menú de navegación hacia la derecha */
+}
+
+/* Configuración general del layout usando flexbox */
+#wrapper {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+}
+
+#sidebar-wrapper {
+    width: 250px;
+    /* Anchura fija del sidebar */
+    height: 100vh;
+    /* Ocupa toda la altura de la pantalla */
+    left: -250px;
+    /* Inicialmente oculto a la izquierda */
+    position: fixed;
+    /* Fija la posición del sidebar */
+    transition: all 0.3s ease;
+    /* Transición suave para mostrar/ocultar el sidebar */
+}
+
+#wrapper.toggled #sidebar-wrapper {
+    left: 0;
+    /* Muestra el sidebar cuando está activado */
+}
+
+#page-content-wrapper {
+    width: 100%;
+    padding: 20px;
+    transition: all 0.3s ease;
+    /* Transición suave al mostrar el contenido */
+    margin-left: 0;
+}
+
+#wrapper.toggled #page-content-wrapper {
+    margin-left: 250px;
+    /* Ajusta el contenido cuando el sidebar está visible */
+}
+
+/* Estilo de las tarjetas (card) para que tengan sombra y sin borde */
+.card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* Sombra suave */
+    border: none;
+    /* Sin borde */
+}
+
+/* Estilo para los botones con bordes y colores personalizados */
+.btn-outline-secondary {
+    color: #333;
+    border-color: #333;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #333;
+    color: white;
+}
+
+/* Estilo para los enlaces del navbar */
+.navbar-light .navbar-nav .nav-link {
+    color: #333;
+    margin-right: 15px;
+}
+
+/* Estilo general para el cuerpo del documento */
+body {
+    font-family: 'Nunito', sans-serif;
+    /* Fuente moderna y ligera */
+    background: linear-gradient(135deg, #e0f7fa, #fff9c4);
+    /* Fondo con degradado suave */
+    color: #333;
+    font-size: 14px;
+    /* Tamaño de fuente principal */
+    margin: 0;
+    /* Elimina márgenes predeterminados */
+}
+
+/* Estilo para títulos */
+h1,
+h3 {
+    font-weight: 600;
+    color: #333;
+    font-size: 18px;
+    /* Tamaño más compacto para títulos */
+}
+
+.container-fluid {
+    padding: 1rem;
+    /* Margen alrededor del contenido */
+}
+
+/* Estilo para el encabezado del sidebar */
+#sidebar-wrapper .sidebar-heading {
+    padding: 1rem;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    color: rgb(255, 255, 255);
+    /* Texto en blanco */
+    background-color: #1a252f;
+    /* Fondo oscuro */
+}
+
+/* Añade una barra lateral activa cuando el usuario pasa el mouse o selecciona un ítem */
+#sidebar-wrapper .list-group-item:hover::before,
+#sidebar-wrapper .list-group-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 5px;
+    /* Ancho de la barra de selección */
+    height: 100%;
+    background-color: #26a69a;
+    /* Color verde claro de la barra */
+    transition: background-color 0.3s ease;
+}
+
+/* Mantiene el color del texto de los ítems del sidebar */
+#sidebar-wrapper .list-group-item-action {
+    color: inherit;
+    /* Mantener el color original */
+    text-decoration: none;
+    /* Elimina subrayado */
+}
+
+/* Estilo general para la barra de navegación */
+.navbar {
+    background-color: #00796b;
+    /* Fondo verde oscuro */
+    padding: 0.75rem 1.25rem;
+    font-size: 16px;
+    color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* Sombra ligera */
+}
+
+/* Personalización del botón de menú (hamburguesa) */
+.navbar-toggler {
+    border-color: #fff;
+    color: #fff;
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3Csvg ...");
+    /* Ícono blanco */
+}
+
+/* Links dentro del navbar */
+.navbar-nav .nav-link {
+    color: #ffffff;
+    margin-right: 1rem;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #b2dfdb;
+    /* Efecto hover en color más claro */
+}
+
+/* Estilo del botón de menú lateral */
+#menu-toggle {
+    background-color: #26a69a;
+    border: none;
+    color: #ffffff;
+    border-radius: 50%;
+    /* Botón circular */
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#menu-toggle:hover {
+    background-color: #00796b;
+}
+
+/* Estilo para las columnas de tareas */
+.tareas-columna {
+    border: none;
+    background-color: #ffffff;
+    padding: 0.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    /* Sombra ligera */
+    min-height: 250px;
+    /* Altura mínima */
+}
+
+/* Indicar cuando un ítem está siendo arrastrado sobre una columna */
+.tareas-columna.drag-over {
+    background-color: #e3f2fd;
+    /* Fondo azul claro cuando algo es arrastrado */
+    border: 2px dashed #007bff;
+    /* Borde punteado */
+}
+
+/* Estilo para las tarjetas de las tareas */
+.card {
+    border: none;
+    background-color: #ffffff;
+    border-radius: 6px;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+    /* Sombra ligera */
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+/* Efecto hover para tarjetas */
+.card:hover {
+    transform: translateY(-2px);
+    /* Levanta ligeramente la tarjeta */
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    /* Sombra más intensa */
+}
+
+/* Estilo general para los botones */
+.btn {
+    padding: 0.35rem 0.75rem;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    /* Efecto hover */
+}
+
+.btn-success {
+    background-color: #28a745;
+    border: none;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border: none;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+/* Estilo para el formulario de nueva tarea */
+#nuevaTareaForm {
+    background-color: #ffffff;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    /* Sombra ligera */
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.form-control {
+    font-size: 13px;
+    padding: 0.35rem 0.75rem;
+    border-radius: 4px;
+}
+
+#nuevaTareaBtn {
+    font-size: 14px;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+}
+
+.custom-swal-popup {
+    background-color: #f8f9fa !important;
+    padding: 15px;
+}
+
+.custom-download-button {
+    background-color: #28a745; /* Cambia al color deseado (azul Bootstrap en este caso) */
+    color: white; /* Color del texto */
+    border: none; /* Elimina bordes */
+    border-radius: 4px; /* Opcional: bordes redondeados */
+    padding: 10px 20px; /* Tamaño del botón */
+    font-size: 16px; /* Tamaño del texto */
+}
+
+.custom-download-button:hover {
+    background-color: #218838; /* Color al pasar el ratón por encima */
+}
+

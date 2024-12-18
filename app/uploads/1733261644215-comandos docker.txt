@@ -1,0 +1,14 @@
+Composer: Si necesitas instalar dependencias usando Composer, puedes hacerlo dentro del contenedor web. Para instalar dependencias desde dentro del contenedor, ejecuta:
+
+docker-compose exec web composer install
+Esto ejecutará composer install dentro del contenedor y guardará las dependencias en la carpeta vendor.
+
+Detener Contenedores Actuales
+docker-compose down
+
+Reconstruir y Levantar los Contenedores con la nueva configuración:
+docker-compose up --build -d
+
+
+Detén los contenedores actuales y elimina las imágenes obsoletas:
+docker-compose down --rmi all

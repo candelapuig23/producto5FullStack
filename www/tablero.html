@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tablero - Tareas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="assets/list_992.png" type="image/png">
+</head>
+<body>
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar -->
+        <div class="bg-light border-right" id="sidebar-wrapper">
+            <div class="sidebar-heading">Menú</div>
+            <div class="list-group list-group-flush">
+                <a href="index.html" class="list-group-item list-group-item-action bg-light">Mis Proyectos</a>
+                <a href="#" class="list-group-item list-group-item-action bg-light">Configuración</a>
+                <a href="#" class="list-group-item list-group-item-action bg-light">Salir</a>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div id="page-content-wrapper">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+                <div class="container-fluid">
+                    <button class="btn btn-primary" id="menu-toggle">☰</button>
+                    <a class="navbar-brand mx-auto" href="index.html">
+                        <img src="assets/logo.png" alt="JSConnect TodoList">
+                    </a>
+                </div>
+            </nav>
+
+            <div class="container-fluid">
+                <h1 class="mt-4" id="panelTitle">Tablero - Tareas</h1>
+                <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#newTaskModal">Añadir Tarea</button>
+
+                <div class="row mt-4">
+                    <div class="col-lg-4">
+                        <h3>Por Hacer</h3>
+                        <div id="por_hacer" class="tareas-columna" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                    </div>
+                    <div class="col-lg-4">
+                        <h3>En Proceso</h3>
+                        <div id="en_proceso" class="tareas-columna" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                    </div>
+                    <div class="col-lg-4">
+                        <h3>Finalizado</h3>
+                        <div id="finalizado" class="tareas-columna" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para crear o editar tareas -->
+    <div class="modal fade" id="newTaskModal" tabindex="-1" aria-labelledby="newTaskModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newTaskModalLabel">Nueva Tarea</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="panelId" value="">
+                    <div class="mb-3">
+                        <label for="newTaskTitle" class="form-label">Título del Elemento</label>
+                        <input type="text" class="form-control" id="newTaskTitle" placeholder="Introduce el título" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newTaskDescription" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="newTaskDescription" rows="3" placeholder="Descripción" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newTaskResponsible" class="form-label">Responsable</label>
+                        <input type="text" class="form-control" id="newTaskResponsible" placeholder="Introduce el nombre del responsable" required>
+                    </div>                    
+                    <div class="mb-3">
+                        <label for="newTaskEstado" class="form-label">Estado</label>
+                        <select class="form-control" id="newTaskEstado" required>
+                            <option value="por_hacer">Por Hacer</option>
+                            <option value="en_proceso">En Proceso</option>
+                            <option value="finalizado">Finalizado</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="saveTaskButton">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal para adjuntar archivos -->
+    <div class="modal fade" id="attachFileModal" tabindex="-1" aria-labelledby="attachFileModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="attachFileModalLabel">Adjuntar Archivo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="attachFileForm">
+                        <input type="hidden" id="attachTaskId" value="">
+                        <div class="mb-3">
+                            <label for="fileInput" class="form-label">Seleccionar archivo</label>
+                            <input type="file" class="form-control" id="fileInput" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="uploadFile()">Subir Archivo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script src="configFrontend.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/tasks.js"></script>
+<script src="js/tablero.js"></script>
+<script src="js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</body>
+</html>

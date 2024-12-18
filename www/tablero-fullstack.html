@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tablero - Desarrollo Full Stack</title>
+    <!-- Cargar Bootstrap desde un CDN para el diseño responsivo y componentes -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Cargar los estilos personalizados desde el archivo local style.css -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="assets/list_992.png" type="image/png">
+</head>
+
+<body>
+    <!-- Contenedor principal que incluye el sidebar y el contenido -->
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar: Barra lateral con opciones de navegación -->
+        <div class="bg-light border-right" id="sidebar-wrapper">
+            <div class="sidebar-heading">Menu</div>
+            <div class="list-group list-group-flush">
+                <a href="index.html" class="list-group-item list-group-item-action bg-light">Mis Proyectos</a>
+                <a href="#" class="list-group-item list-group-item-action bg-light">Configuración</a>
+                <a href="#" class="list-group-item list-group-item-action bg-light">Salir</a>
+            </div>
+        </div>
+
+        <!-- Contenido principal de la página -->
+        <div id="page-content-wrapper">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+                <div class="container-fluid">
+                    <!-- Botón para alternar el sidebar -->
+                    <button class="btn btn-primary" id="menu-toggle">☰</button>
+                    <!-- Logo centrado -->
+                    <a class="navbar-brand mx-auto" href="index.html">
+                        <img src="assets/logo.png" alt="JSConnect TodoList">
+                    </a>
+                </div>
+            </nav>
+
+            <!-- Contenido del tablero -->
+            <div class="container-fluid">
+                <h1 class="mt-4">Tablero - Desarrollo Full Stack</h1>
+
+                <!-- Botón para abrir el modal de nueva tarea -->
+                <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#newTaskModal">Añadir
+                    Tarea</button>
+
+                <!-- Columnas del tablero -->
+                <div class="row mt-4">
+                    <div class="col-lg-4">
+                        <h3>Por Hacer</h3>
+                        <!-- Columna para tareas "Por Hacer" -->
+                        <div id="porHacer" class="tareas-columna" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <h3>En Proceso</h3>
+                        <!-- Columna para tareas "Hecho" -->
+                        <div id="hecho" class="tareas-columna" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+                    </div>
+                    <div class="col-lg-4">
+                        <h3>Finalizado</h3>
+                        <!-- Columna para tareas "Finalizado" -->
+                        <div id="finalizado" class="tareas-columna" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Nueva/Editar Tarea -->
+    <div class="modal fade" id="newTaskModal" tabindex="-1" aria-labelledby="newTaskModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newTaskModalLabel">Nueva Tarea</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="tareaId" value="">
+                    <div class="mb-3">
+                        <label for="newTaskTitle" class="form-label">Título del Elemento</label>
+                        <input type="text" class="form-control" id="newTaskTitle" placeholder="Introduce el título"
+                            required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newTaskDescription" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="newTaskDescription" rows="3"
+                            placeholder="Descripción" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newTaskResponsable" class="form-label">Responsable</label>
+                        <input type="text" class="form-control" id="newTaskResponsable"
+                            placeholder="Nombre del responsable" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newTaskFecha" class="form-label">Fecha de Finalización</label>
+                        <input type="date" class="form-control" id="newTaskFecha" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newTaskEstado" class="form-label">Estado</label>
+                        <select class="form-control" id="newTaskEstado" required>
+                            <option value="porHacer">Por Hacer</option>
+                            <option value="hecho">En Proceso</option>
+                            <option value="finalizado">Finalizado</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="saveTaskButton">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Confirmación de Eliminación -->
+    <div class="modal fade" id="deleteTaskModal" tabindex="-1" aria-labelledby="deleteTaskModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteTaskModalLabel">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas eliminar esta tarea?</p>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteTaskButton">Eliminar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cargar Bootstrap desde un CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Funcionalidad para arrastrar y soltar (drag & drop) -->
+    <script>
+        // Permitir el drop en las columnas del tablero
+        function allowDrop(event) {
+            event.preventDefault();
+        }
+
+        // Iniciar el arrastre de una tarea
+        function drag(event) {
+            event.dataTransfer.setData("text", event.target.id);
+        }
+
+        // Soltar una tarea en una columna
+        function drop(event) {
+            event.preventDefault();
+            const id = event.dataTransfer.getData("text");
+            const tarea = document.getElementById(id);
+            event.target.appendChild(tarea);
+        }
+
+        // Mostrar el modal de nueva tarea
+        document.getElementById('saveTaskButton').addEventListener('click', function () {
+            const tareaId = document.getElementById('tareaId').value;
+            const titulo = document.getElementById('newTaskTitle').value;
+            const descripcion = document.getElementById('newTaskDescription').value;
+            const responsable = document.getElementById('newTaskResponsable').value;
+            const fecha = document.getElementById('newTaskFecha').value;
+            const estado = document.getElementById('newTaskEstado').value;
+
+            let columnaDestino = document.getElementById(estado);
+
+            if (tareaId) {
+                // Editar tarea existente
+                const tarea = document.getElementById(tareaId);
+                tarea.querySelector('.card-title').innerText = titulo;
+                tarea.querySelector('.card-text').innerText = descripcion;
+                tarea.querySelector('.responsable').innerText = `Responsable: ${responsable}`;
+                tarea.querySelector('.fecha').innerText = `Fecha de finalización: ${fecha}`;
+                columnaDestino.appendChild(tarea);
+            } else {
+                // Crear nueva tarea
+                const nuevaTareaId = `tarea_${Date.now()}`;
+                const tareaHTML = `
+                <div class="card mb-3 draggable" id="${nuevaTareaId}" draggable="true" ondragstart="drag(event)">
+                    <div class="card-body">
+                        <h5 class="card-title">${titulo}</h5>
+                        <p class="card-text">${descripcion}</p>
+                        <p class="responsable"><strong>Responsable:</strong> ${responsable}</p>
+                        <p class="fecha"><strong>Fecha de finalización:</strong> ${fecha}</p>
+                        <button class="btn btn-primary editar-tarea">Editar</button>
+                        <button class="btn btn-danger eliminar-tarea" data-bs-toggle="modal" data-bs-target="#deleteTaskModal">Eliminar</button>
+                    </div>
+                </div>`;
+                columnaDestino.innerHTML += tareaHTML;
+            }
+
+            agregarEventos(); // Añadir eventos a las nuevas tareas
+            const modal = bootstrap.Modal.getInstance(document.getElementById('newTaskModal'));
+            modal.hide(); // Ocultar el modal de nueva tarea
+        });
+
+        // Variables para eliminar tarea
+        let tareaAEliminar = null;
+
+        // Función para añadir eventos a las tareas
+        function agregarEventos() {
+            // Agregar eventos para editar y eliminar tareas
+            document.querySelectorAll('.editar-tarea').forEach(button => {
+                button.addEventListener('click', function () {
+                    const tarea = this.closest('.card');
+                    const tareaId = tarea.id;
+                    const titulo = tarea.querySelector('.card-title').innerText;
+                    const descripcion = tarea.querySelector('.card-text').innerText;
+                    const responsable = tarea.querySelector('.responsable').innerText.split(': ')[1];
+                    const fecha = tarea.querySelector('.fecha').innerText.split(': ')[1];
+
+                    // Cargar los datos en el modal para edición
+                    document.getElementById('tareaId').value = tareaId;
+                    document.getElementById('newTaskTitle').value = titulo;
+                    document.getElementById('newTaskDescription').value = descripcion;
+                    document.getElementById('newTaskResponsable').value = responsable;
+                    document.getElementById('newTaskFecha').value = fecha;
+
+                    // Abrir el modal
+                    const modal = new bootstrap.Modal(document.getElementById('newTaskModal'));
+                    modal.show();
+                });
+            });
+
+            document.querySelectorAll('.eliminar-tarea').forEach(button => {
+                button.addEventListener('click', function () {
+                    // Guardar la tarea a eliminar y mostrar el modal de confirmación
+                    tareaAEliminar = this.closest('.card');
+                    const modal = new bootstrap.Modal(document.getElementById('deleteTaskModal'));
+                    modal.show();
+                });
+            });
+        }
+
+        // Confirmar eliminación de tarea
+        document.getElementById('confirmDeleteTaskButton').addEventListener('click', function () {
+            if (tareaAEliminar) {
+                tareaAEliminar.remove();
+                tareaAEliminar = null; // Reiniciar la variable
+                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteTaskModal'));
+                modal.hide(); // Ocultar el modal de confirmación
+            }
+        });
+
+        agregarEventos();
+    </script>
+<!-- Cargar Bootstrap desde un CDN -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Funcionalidad para arrastrar y soltar (drag & drop) -->
+<script>
+    // Permitir el drop en las columnas del tablero
+    function allowDrop(event) {
+        event.preventDefault();
+    }
+
+    // Iniciar el arrastre de una tarea
+    function drag(event) {
+        event.dataTransfer.setData("text", event.target.id);
+    }
+
+    // Soltar una tarea en una columna
+    function drop(event) {
+        event.preventDefault();
+        const id = event.dataTransfer.getData("text");
+        const tarea = document.getElementById(id);
+        event.target.appendChild(tarea);
+    }
+
+    // Función para limpiar cualquier backdrop que quede después de cerrar un modal
+    function cleanBackdrop() {
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+    }
+
+    // Confirmar eliminación de tarea
+    document.getElementById('confirmDeleteTaskButton').addEventListener('click', function () {
+        if (tareaAEliminar) {
+            tareaAEliminar.remove();
+            tareaAEliminar = null; // Reiniciar la variable
+            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteTaskModal'));
+            modal.hide(); // Ocultar el modal de confirmación
+
+            // Limpiar cualquier backdrop sobrante
+            cleanBackdrop();
+        }
+    });
+
+    // Asegurar que no quede ningún backdrop tras cerrar cualquier modal
+    document.addEventListener('hidden.bs.modal', function () {
+        cleanBackdrop();
+    });
+
+    // Función para añadir eventos a las tareas (editar/eliminar)
+    function agregarEventos() {
+        // Agregar eventos para editar y eliminar tareas
+        document.querySelectorAll('.editar-tarea').forEach(button => {
+            button.addEventListener('click', function () {
+                const tarea = this.closest('.card');
+                const tareaId = tarea.id;
+                const titulo = tarea.querySelector('.card-title').innerText;
+                const descripcion = tarea.querySelector('.card-text').innerText;
+                const responsable = tarea.querySelector('.responsable').innerText.split(': ')[1];
+                const fecha = tarea.querySelector('.fecha').innerText.split(': ')[1];
+
+                // Cargar los datos en el modal para edición
+                document.getElementById('tareaId').value = tareaId;
+                document.getElementById('newTaskTitle').value = titulo;
+                document.getElementById('newTaskDescription').value = descripcion;
+                document.getElementById('newTaskResponsable').value = responsable;
+                document.getElementById('newTaskFecha').value = fecha;
+
+                // Abrir el modal
+                const modal = new bootstrap.Modal(document.getElementById('newTaskModal'));
+                modal.show();
+            });
+        });
+
+        document.querySelectorAll('.eliminar-tarea').forEach(button => {
+            button.addEventListener('click', function () {
+                // Guardar la tarea a eliminar y mostrar el modal de confirmación
+                tareaAEliminar = this.closest('.card');
+                const modal = new bootstrap.Modal(document.getElementById('deleteTaskModal'));
+                modal.show();
+            });
+        });
+    }
+
+    agregarEventos();
+</script>
+
+<!-- Cargar el script personalizado y Bootstrap solo al final -->
+<script src="js/main.js"></script>
+
+</body>
+
+</html>
