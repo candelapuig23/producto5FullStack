@@ -1,5 +1,5 @@
 
-const TaskController = require('../controllers/TaskController');
+const TaskController = require('../../controllers/TaskController');
 
 const taskResolver = {
     Query: {

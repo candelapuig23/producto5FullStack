@@ -1,5 +1,5 @@
 
-const PanelController = require('../controllers/PanelController');
+const PanelController = require('../../controllers/PanelController');
 
 
 const panelResolver = {
