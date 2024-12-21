@@ -1,10 +1,33 @@
+// Usar la instancia global de Socket desde socket.js
+const socket = window.Socket && window.Socket.socket;
+if (!socket) {
+    console.error('Socket no está definido. Verifica que socket.js se haya cargado correctamente.');
+}
+
+// Escuchar eventos del servidor para actualizaciones en tiempo real
+if (socket) {
+    socket.on('actualizarTablero', async (data) => {
+        console.log('Actualización del tablero recibida:', data);
+        if (typeof displayTasks === 'function') {
+            await displayTasks(); // Refrescar las tareas en el frontend
+        }
+    });
+} else {
+    console.error('Socket no está disponible. Verifica la conexión.');
+}
+
+// Emitir eventos al servidor cuando se actualizan tareas
+async function notifyTaskUpdated(task) {
+    if (socket && socket.connected) {
+        socket.emit('tareaActualizada', task); // Notificar a otros clientes
+    } else {
+        console.error('Socket no está conectado');
+    }
+}
+
 // Obtener el ID del panel desde la URL
-const panelId = (() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get('panelId');
-})();
+const panelId = new URLSearchParams(window.location.search).get('panelId');
 if (!panelId) {
-    console.error("Error: 'panelId' no está definido en la URL.");
     alert("No se puede cargar el tablero porque falta el ID del panel en la URL.");
     throw new Error("El ID del panel es obligatorio.");
 }
@@ -26,15 +49,9 @@ async function fetchTasks() {
             }
         }
     `;
-
-    try {
-        const data = await window.graphqlQuery(query);
-        return data.getTasks;
-    } catch (error) {
-        console.error('Error al obtener las tareas:', error);
-        throw error;
-    }
+    return await window.graphqlQuery(query);
 }
+
 
 // Función para crear una nueva tarea
 async function createTask(title, description, panelId, responsible, status) {
@@ -54,6 +71,7 @@ async function createTask(title, description, panelId, responsible, status) {
     `;
     try {
         const data = await window.graphqlQuery(mutation);
+        notifyTaskUpdated(data.createTask); // Notificar al servidor
         return data.createTask;
     } catch (error) {
         console.error('Error al crear la tarea:', error);
@@ -78,6 +96,7 @@ async function updateTask(id, title, description, completed, responsible, status
     `;
     try {
         const data = await window.graphqlQuery(mutation);
+        notifyTaskUpdated(data.updateTask); // Notificar al servidor
         return data.updateTask;
     } catch (error) {
         console.error('Error al actualizar la tarea:', error);
@@ -96,6 +115,7 @@ async function deleteTask(id) {
     `;
     try {
         await window.graphqlQuery(mutation);
+        notifyTaskUpdated({ id }); // Notificar al servidor
         await displayTasks(); // Actualizar la vista después de eliminar
         Swal.fire(
             '¡Eliminada!',
@@ -132,10 +152,10 @@ async function displayTasks() {
             taskCard.ondragstart = drag;
 
             const fileIcon = task.files && task.files.length > 0
-            ? `<button class="btn btn-link p-0" onclick="openFilePopup('/uploads/${task.files[0]}')">
-                <i class="bi bi-file-earmark-text" style="font-size: 1.5rem; color: #007bff;"></i>
-               </button>`
-            : '';
+                ? `<button class="btn btn-link p-0" onclick="openFilePopup('/uploads/${task.files[0]}')">
+                    <i class="bi bi-file-earmark-text" style="font-size: 1.5rem; color: #007bff;"></i>
+                   </button>`
+                : '';
 
             taskCard.innerHTML = `
                 <div class="card-body">
@@ -143,7 +163,7 @@ async function displayTasks() {
                     <p class="card-text">${task.description}</p>
                     <p class="card-text"><strong>Responsable:</strong> ${task.responsible}</p>
                     <p class="card-text"><strong>Estado:</strong> ${task.status}</p>
-                    ${fileIcon} <!-- Mostrar ícono si hay archivo -->
+                    ${fileIcon}
                     <button class="btn btn-danger btn-sm" onclick="deleteTask('${task.id}')">Eliminar</button>
                     <button class="btn btn-primary btn-sm" onclick='openEditModal(${JSON.stringify(task)})'>Editar</button>
                     <button class="btn btn-secondary btn-sm" onclick="openAttachFileModal('${task.id}')">Adjuntar Archivo</button>
@@ -160,6 +180,12 @@ async function displayTasks() {
         }
     });
 }
+
+// Llamada inicial para mostrar las tareas
+window.onload = async function () {
+    await displayTasks();
+};
+
 
 // Función para abrir el modal en modo edición
 function openEditModal(task) {
@@ -345,10 +371,6 @@ function forceDownload(fileUrl) {
  document.body.removeChild(a);
 }
   
-
-
-
-
 
 // Llamada inicial para mostrar las tareas
 window.onload = async function () {

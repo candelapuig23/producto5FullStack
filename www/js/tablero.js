@@ -1,4 +1,22 @@
-// Obtener el ID del panel desde la URL
+// Usar la instancia global de Socket desde socket.js
+const socket = window.Socket && window.Socket.socket;
+if (!socket) {
+    console.error('Socket no está definido. Verifica que socket.js se haya cargado correctamente.');
+}
+// Escuchar eventos del servidor para actualizaciones en tiempo real
+if (socket) {
+    socket.on('actualizarPaneles', async () => {
+        console.log('Actualización de paneles recibida.');
+        try {
+            await displayPanels();
+        } catch (error) {
+            console.error('Error al actualizar los paneles:', error);
+        }
+    });
+} else {
+    console.error('Socket no está disponible. Verifica la conexión.');
+}
+
 const panelId = new URLSearchParams(window.location.search).get('panelId');
 
 if (!panelId) {
@@ -24,7 +42,12 @@ async function setPanelTitle() {
     }
 }
 
-/* Inicializar el tablero con tareas
+// Función para emitir eventos de actualización
+async function notifyPanelUpdated(data) {
+    socket.emit('panelActualizado', data); // Notificar al servidor y otros clientes
+}
+
+// Función para inicializar y mostrar las tareas
 async function displayTasks() {
     const query = `
         query {
@@ -37,6 +60,7 @@ async function displayTasks() {
                 responsible
                 createdAt
                 status
+                files
             }
         }
     `;
@@ -97,7 +121,7 @@ async function displayTasks() {
     } catch (error) {
         console.error('Error al mostrar las tareas:', error);
     }
-}*/
+}
 
 // Función para abrir el modal en modo edición
 function openEditModal(task) {
@@ -123,6 +147,7 @@ document.getElementById('saveTaskButton').addEventListener('click', async functi
     const status = document.getElementById('newTaskEstado').value;
 
     try {
+        let task;
         if (taskId) {
             const mutation = `
                 mutation {
@@ -134,10 +159,14 @@ document.getElementById('saveTaskButton').addEventListener('click', async functi
                         status: "${status}"
                     ) {
                         id
+                        title
+                        description
+                        responsible
+                        status
                     }
                 }
             `;
-            await window.graphqlQuery(mutation);
+            task = await window.graphqlQuery(mutation);
         } else {
             const mutation = `
                 mutation {
@@ -149,11 +178,17 @@ document.getElementById('saveTaskButton').addEventListener('click', async functi
                         status: "${status}"
                     ) {
                         id
+                        title
+                        description
+                        responsible
+                        status
                     }
                 }
             `;
-            await window.graphqlQuery(mutation);
+            task = await window.graphqlQuery(mutation);
         }
+
+        await notifyPanelUpdated(task); // Notificar cambios al servidor
         delete this.dataset.taskId;
         this.textContent = "Guardar";
         await displayTasks();
@@ -166,17 +201,25 @@ document.getElementById('saveTaskButton').addEventListener('click', async functi
 
 // Funciones Drag and Drop
 function drag(ev) {
-    ev.dataTransfer.setData("text", ev.target.id);
+    if (ev.target && ev.target.id) {
+        ev.dataTransfer.setData("text", ev.target.id);
+        console.log(`Elemento arrastrado: ${ev.target.id}`);
+    } else {
+        console.error('Elemento arrastrado no válido:', ev.target);
+    }
 }
 
+// Función para permitir el Drop (soltar)
 function allowDrop(ev) {
-    ev.preventDefault();
+    ev.preventDefault(); // Permitir el evento de soltar
 }
 
+// Función para manejar el Drop (soltar)
 async function drop(ev) {
-    ev.preventDefault();
-    const taskId = ev.dataTransfer.getData("text");
-    const targetColumn = ev.target.id;
+    ev.preventDefault(); // Prevenir comportamientos predeterminados
+
+    const taskId = ev.dataTransfer.getData("text"); // Obtener el ID del elemento arrastrado
+    const targetColumn = ev.target.id; // Obtener la columna de destino
 
     const statusMap = {
         porHacer: 'por_hacer',
@@ -184,22 +227,38 @@ async function drop(ev) {
         finalizado: 'finalizado',
     };
 
+    // Validar si la columna de destino es válida
     const newStatus = statusMap[targetColumn];
-    if (!newStatus) return;
+    if (!newStatus) {
+        console.error(`Columna de destino no válida: ${targetColumn}`);
+        return;
+    }
 
-    const mutation = `
-        mutation {
-            updateTask(
-                id: "${taskId}",
-                status: "${newStatus}"
-            ) {
-                id
-            }
-        }
-    `;
     try {
-        await window.graphqlQuery(mutation);
-        await displayTasks();
+        console.log(`Moviendo tarea ${taskId} a la columna ${newStatus}`);
+
+        // Actualizar la tarea en el servidor usando GraphQL
+        const mutation = `
+            mutation {
+                updateTask(
+                    id: "${taskId}",
+                    status: "${newStatus}"
+                ) {
+                    id
+                    status
+                }
+            }
+        `;
+        const task = await window.graphqlQuery(mutation);
+
+        // Notificar el cambio al servidor y actualizar el tablero
+        if (task && task.updateTask) {
+            await notifyPanelUpdated(task.updateTask); // Notificar a otros clientes
+            await displayTasks(); // Refrescar las tareas en el frontend
+            console.log(`Tarea ${taskId} movida exitosamente a ${newStatus}`);
+        } else {
+            console.warn(`No se recibió respuesta válida al actualizar la tarea ${taskId}`);
+        }
     } catch (error) {
         console.error('Error al mover la tarea:', error);
     }

@@ -1,19 +1,16 @@
-const Task = require('../../models/Task');
-const Panel = require('../../models/Panel');
-
-const taskResolver = require('./taskResolver'); // Asegúrate de la ruta correcta
 const panelResolver = require('./panelResolver');
+const taskResolver = require('./taskResolver');
 
 const resolvers = {
     Query: {
         ...panelResolver.Query,
-        ...taskResolver.Query, // Asume que taskResolver tiene definidas sus queries
+        ...taskResolver.Query,
     },
     Mutation: {
         ...panelResolver.Mutation,
-        ...taskResolver.Mutation, // Asume que taskResolver tiene definidas sus mutations
+        ...taskResolver.Mutation,
     },
-    Panel: panelResolver.Panel // Esto debería funcionar ahora
+ 
 };
 
 module.exports = resolvers;

@@ -1,6 +1,31 @@
-//import apiUrl from './configFrontend.js';
+// Usar la instancia global de Socket desde socket.js
+const socket = window.Socket && window.Socket.socket;
+if (!socket) {
+    console.error('Socket no está definido. Verifica que socket.js se haya cargado correctamente.');
+}
 
-let panelToDeleteId = null; // Variable para almacenar el ID del panel a eliminar
+// Escuchar eventos del servidor para actualizaciones en tiempo real
+if (socket) {
+    socket.on('actualizarPaneles', async () => {
+        console.log('Actualización de paneles recibida.');
+        try {
+            await displayPanels();
+        } catch (error) {
+            console.error('Error al actualizar los paneles:', error);
+        }
+    });
+} else {
+    console.error('Socket no está disponible. Verifica la conexión.');
+}
+
+// Emitir eventos al servidor cuando se actualizan paneles
+async function notifyPanelUpdated(panel) {
+    if (socket && socket.connected) {
+        socket.emit('panelActualizado', panel);
+    } else {
+        console.error('Socket no está conectado');
+    }
+}
 
 // Obtener todos los paneles desde el backend
 const fetchPanels = async () => {
@@ -27,9 +52,10 @@ const fetchPanels = async () => {
 
         if (!response.ok) throw new Error('Error en fetchPanels');
         const { data } = await response.json();
-        return data.getPanels;
+        return data.getPanels || [];
     } catch (error) {
         console.error('Error en fetchPanels:', error);
+        return []; // Retorna un array vacío si hay errores
     }
 };
 
@@ -146,35 +172,52 @@ async function deletePanel() {
 
 // Mostrar paneles en la interfaz
 async function displayPanels() {
-    const panels = await fetchPanels();
-    const container = document.getElementById('proyectosContainer');
+    try {
+        const panels = await fetchPanels(); // Obtener los paneles desde el servidor
+        const container = document.getElementById('proyectosContainer');
 
-    // Limpiar contenedor pero mantener los paneles estáticos
-    const staticPanels = Array.from(container.querySelectorAll('.static-panel')); // Solo seleccionamos los paneles estáticos
-    container.innerHTML = ''; // Limpiar el contenedor
+        if (!container) {
+            console.error('Contenedor de proyectos no encontrado.');
+            return;
+        }
 
-    // Agregar los paneles estáticos de nuevo
-    staticPanels.forEach(panel => {
-        container.appendChild(panel);
-    });
+        // Limpiar contenedor pero mantener los paneles estáticos
+        const staticPanels = Array.from(container.querySelectorAll('.static-panel')); // Paneles estáticos existentes
+        container.innerHTML = ''; // Limpiar el contenedor
 
-    // Agregar paneles dinámicos
-    panels.forEach(panel => {
-        const panelElement = document.createElement('div');
-        panelElement.classList.add('col-lg-6', 'panel-item');
-        panelElement.innerHTML = `
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">${panel.name}</h5>
-                    <p class="card-text">${panel.description}</p>
-                    <a href="tablero.html?panelId=${panel.id}" class="btn btn-primary">Ver Tareas</a>
-                   <button class="btn btn-danger btn-sm" onclick="confirmDeletePanel('${panel.id}')">Eliminar</button>
+        // Restaurar los paneles estáticos
+        staticPanels.forEach(panel => {
+            container.appendChild(panel);
+        });
+
+        if (!panels || panels.length === 0) {
+            console.warn('No se encontraron paneles para mostrar.');
+            return;
+        }
+
+        // Añadir los paneles dinámicos
+        panels.forEach(panel => {
+            const panelElement = document.createElement('div');
+            panelElement.classList.add('col-lg-6', 'panel-item');
+            panelElement.innerHTML = `
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">${panel.name}</h5>
+                        <p class="card-text">${panel.description}</p>
+                        <a href="tablero.html?panelId=${panel.id}" class="btn btn-primary">Ver Tareas</a>
+                        <button class="btn btn-danger btn-sm" onclick="confirmDeletePanel('${panel.id}')">Eliminar</button>
+                    </div>
                 </div>
-            </div>
-        `;
-        container.appendChild(panelElement);
-    });
+            `;
+            container.appendChild(panelElement);
+        });
+
+        console.log(`Se han mostrado ${panels.length} panel(es) dinámico(s).`);
+    } catch (error) {
+        console.error('Error al mostrar los paneles:', error);
+    }
 }
+
 
 // Crear un nuevo panel desde el modal
 document.getElementById('savePanelButton').addEventListener('click', async () => {
