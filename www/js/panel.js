@@ -6,17 +6,24 @@ if (!socket) {
 
 // Escuchar eventos del servidor para actualizaciones en tiempo real
 if (socket) {
-    socket.on('actualizarPaneles', async () => {
-        console.log('Actualización de paneles recibida.');
-        try {
-            await displayPanels();
-        } catch (error) {
-            console.error('Error al actualizar los paneles:', error);
-        }
+    socket.on('panelCreado', (data) => {
+        console.log(data.message); // Muestra "Nuevo panel creado"
+        displayPanels(); // Actualiza los paneles
+    });
+
+    socket.on('actualizarPaneles', (data) => {
+        console.log(data.message); // Muestra "Panel actualizado"
+        displayPanels(); // Actualiza los paneles
+    });
+
+    socket.on('panelEliminado', (data) => {
+        console.log(data.message); // Muestra "Panel eliminado"
+        displayPanels(); // Actualiza los paneles
     });
 } else {
     console.error('Socket no está disponible. Verifica la conexión.');
 }
+
 
 // Emitir eventos al servidor cuando se actualizan paneles
 async function notifyPanelUpdated(panel) {

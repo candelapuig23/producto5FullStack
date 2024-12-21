@@ -18,7 +18,7 @@ const PanelController = {
         try {
             const panel = new Panel(data);
             const savedPanel = await panel.save();
-            io.emit('actualizarPaneles'); // Emitir evento
+            io.emit('panelCreado', { message: 'Nuevo panel creado', panel: savedPanel }); // Emitir evento específico
             return savedPanel;
         } catch (error) {
             throw new Error('Error al crear el panel: ' + error.message);
@@ -28,7 +28,7 @@ const PanelController = {
         try {
             const panel = await Panel.findByIdAndUpdate(id, data, { new: true });
             if (!panel) throw new Error(`Panel con ID ${id} no encontrado`);
-            io.emit('actualizarPaneles'); // Emitir evento
+            io.emit('actualizarPaneles', { message: 'Panel actualizado', panel }); // Emitir evento específico
             return panel;
         } catch (error) {
             throw new Error('Error al actualizar el panel: ' + error.message);
@@ -39,7 +39,7 @@ const PanelController = {
             await Task.deleteMany({ panelId: id }); // Eliminar tareas asociadas
             const deletedPanel = await Panel.findByIdAndDelete(id);
             if (!deletedPanel) throw new Error(`Panel con ID ${id} no encontrado`);
-            io.emit('actualizarPaneles'); // Emitir evento
+            io.emit('panelEliminado', { message: 'Panel eliminado', panel: deletedPanel }); // Emitir evento específico
             return deletedPanel;
         } catch (error) {
             throw new Error('Error al eliminar el panel: ' + error.message);
@@ -48,3 +48,4 @@ const PanelController = {
 };
 
 module.exports = { PanelController, setSocketInstance };
+
