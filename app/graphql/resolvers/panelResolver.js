@@ -1,7 +1,4 @@
-
-const  PanelController  = require('../../controllers/PanelController');
-
-
+const { PanelController } = require('../../controllers/PanelController');
 
 const panelResolver = {
     Query: {
@@ -9,8 +6,10 @@ const panelResolver = {
         getPanel: async (_, { id }) => await PanelController.getPanelById(id),
     },
     Mutation: {
-        createPanel: async (_, { name, description }) => await PanelController.createPanel({ name, description }),
-        updatePanel: async (_, { id, name, description }) => await PanelController.updatePanel(id, { name, description }),
+        createPanel: async (_, { name, description }) =>
+            await PanelController.createPanel({ name, description }),
+        updatePanel: async (_, { id, name, description }) =>
+            await PanelController.updatePanel(id, { name, description }),
         deletePanel: async (_, { id }) => await PanelController.deletePanel(id),
     },
     Panel: {

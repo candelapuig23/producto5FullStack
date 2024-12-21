@@ -24,8 +24,14 @@ const Task = require('./models/Task'); // Modelo de tareas
 const app = express();
 const server = http.createServer(app); // Define el servidor HTTP basado en Express
 
+// Importar PanelController y la función para configurar io
+const { PanelController, setSocketInstance } = require('./controllers/PanelController');
+
 // Inicializa Socket.IO
 const io = socket.init(server);
+
+// Pasar la instancia de io al controlador
+setSocketInstance(io);
 
 // Configurar eventos básicos para Socket.IO
 io.on('connection', (socket) => {
@@ -35,6 +41,7 @@ io.on('connection', (socket) => {
         console.log('Cliente desconectado:', socket.id);
     });
 });
+
 
 // Habilitar CORS
 const corsOptions = {
