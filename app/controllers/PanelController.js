@@ -10,27 +10,17 @@ const setSocketInstance = (socketIoInstance) => {
 const PanelController = {
     getPanels: async () => {
         try {
+            // Recuperar todos los paneles y poblar las tareas asociadas
             return await Panel.find().populate('tasks');
         } catch (error) {
             throw new Error('Error al obtener los paneles: ' + error.message);
-        }
-    },
-    getPanelById: async (id) => {
-        try {
-            const panel = await Panel.findById(id).populate('tasks');
-            if (!panel) {
-                throw new Error(`Panel con ID ${id} no encontrado`);
-            }
-            return panel;
-        } catch (error) {
-            throw new Error('Error al obtener el panel: ' + error.message);
         }
     },
     createPanel: async (data) => {
         try {
             const panel = new Panel(data);
             const savedPanel = await panel.save();
-            io.emit('panelCreado', savedPanel); // Emitir evento de creación
+            io.emit('actualizarPaneles'); // Emitir evento general
             return savedPanel;
         } catch (error) {
             throw new Error('Error al crear el panel: ' + error.message);
@@ -42,7 +32,7 @@ const PanelController = {
             if (!panel) {
                 throw new Error(`Panel con ID ${id} no encontrado`);
             }
-            io.emit('panelActualizado', panel); // Emitir evento de actualización
+            io.emit('actualizarPaneles'); // Emitir evento general
             return panel;
         } catch (error) {
             throw new Error('Error al actualizar el panel: ' + error.message);
@@ -55,7 +45,7 @@ const PanelController = {
             if (!deletedPanel) {
                 throw new Error(`Panel con ID ${id} no encontrado`);
             }
-            io.emit('panelEliminado', deletedPanel); // Emitir evento de eliminación
+            io.emit('actualizarPaneles'); // Emitir evento general
             return deletedPanel;
         } catch (error) {
             throw new Error('Error al eliminar el panel: ' + error.message);
@@ -63,4 +53,4 @@ const PanelController = {
     },
 };
 
-module.exports = { PanelController, setSocketInstance };
+module.exports = {PanelController, setSocketInstance} ;
